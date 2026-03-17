@@ -2,20 +2,20 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 
 class AlbumRequest extends ApiRequest
 {
+
     public function rules()
     {
         return [
-            'album_id' => ['required', 'integer'],
-            'publisher_id' => ['required', 'exists:users'],
             'title' => ['required'],
             'artist' => ['required'],
-            'release_year' => ['nullable', 'integer'],
-            'genre' => ['nullable'],
-            'description' => ['nullable'],
+            'release_year' => ['required', 'integer'],
+            'genre' => ['required'],
+            'description' => ['required'],
         ];
     }
 

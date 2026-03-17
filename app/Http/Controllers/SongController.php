@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Base\ApiResponse;
 use App\Base\Cursor;
 use App\cursorPage;
+use App\Http\Requests\AlbumAddSongRequest;
 use App\Http\Requests\SongIndexRequest;
 use App\Http\Requests\StatisticsRequest;
 use App\Http\Resources\AlbumResource;
+use App\Http\Resources\AlbumSongStoreResource;
 use App\Http\Resources\SongResource;
 use App\Http\Resources\SongShowResource;
 use App\Http\Resources\StatisticsAlbumResource;
@@ -39,7 +41,10 @@ class SongController extends Controller
 
     public function cover(Song $song)
     {
-
+        if (!\Storage::exists($song->cover_image_path)) {
+            ApiResponse::errorResponse(404, 'Cover not Found');
+        }
+        return response()->file(\Storage::path($song->cover_image_path));
     }
 
     public function show(Song $song)
@@ -74,17 +79,40 @@ class SongController extends Controller
                 $query->withCount('userViewLogs');
             }])
                 ->withCount(['songLabels',]);
+            $query->when($request->input('labels'), function (Builder $query, $value) {
+                $value = explode(',', $value);
+                $query->whereIn('labels.name', $value);
+            });
             return ApiResponse::defaultResponse(200, StatisticsLabelResource::collection($query->get()));
         }
     }
 
     public function delete(Album $album, Song $song)
     {
-
+        if ($album->publisher->isNot(auth()->user())) {
+            ApiResponse::errorResponse(403, 'Access denied');
+        }
+        $song->delete();
+        return ApiResponse::response(200, [
+            'success' => true,
+        ]);
     }
 
-    public function update(Album $album, Song $song)
+    public function update(AlbumAddSongRequest $request, Album $album, Song $song)
     {
+        if ($album->publisher->isNot(auth()->user())) {
+            ApiResponse::errorResponse(403, 'Access denied');
+        }
+        $file = $request->file('cover_image');
+        $imagePath = $file->store('images', 'public');
+        $song->update([
+            ...$request->validated(),
+            'cover_image_path' => $imagePath,
+            'album_id' => $album->getKey(),
+        ]);
+        $labels = Label::whereIn('name', $request->validated('label'))->pluck('label_id');
+        $song->labels()->sync($labels);
 
+        return ApiResponse::defaultResponse(201, new AlbumSongStoreResource($song));
     }
 }

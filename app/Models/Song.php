@@ -5,6 +5,7 @@ namespace App\Models;
 use App\cursorPage;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Song extends Model
@@ -27,6 +28,11 @@ class Song extends Model
     public function album(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Album::class, 'album_id', 'album_id');
+    }
+
+    public function songLabels(): HasMany
+    {
+        return $this->hasMany(SongLabel::class, 'song_id', 'song_id');
     }
 
     public function labels(): BelongsToMany

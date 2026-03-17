@@ -6,6 +6,7 @@ use App\Base\ApiResponse;
 use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class AuthMiddleware
 {
@@ -15,11 +16,12 @@ class AuthMiddleware
         if (!$token) {
             ApiResponse::errorResponse(401, 'Access Token is required');
         }
+        $token = Str::replace('Bearer ', '', $token);
         $user = User::firstWhere('token', $token);
         if (!$user) {
             ApiResponse::errorResponse(401, 'Invalid Access Token');
         }
-        if($user->is_banned){
+        if ($user->is_banned) {
             ApiResponse::errorResponse(403, 'User is banned');
         }
         auth()->login($user);

@@ -5,10 +5,11 @@ namespace App\Models;
 use App\cursorPage;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Album extends Model
 {
-    use cursorPage;
+    use SoftDeletes, cursorPage;
 
     protected $primaryKey = 'album_id';
     protected $fillable = [

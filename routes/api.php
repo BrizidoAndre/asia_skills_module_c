@@ -36,18 +36,18 @@ Route::middleware(AuthMiddleware::class)->group(function () {
     Route::middleware(IsAdminMiddleware::class)->group(function () {
 //        users related actions
         Route::get('users', [UserController::class, 'index']);
-        Route::put('users/{user}', [UserController::class, 'update']);
-        Route::put('users/{user}/ban', [UserController::class, 'ban']);
-        Route::put('users/{user}/unban', [UserController::class, 'unban']);
+        Route::put('users/{user}', [UserController::class, 'update'])->missing(fn() => ApiResponse::errorResponse(404, 'User not found'));
+        Route::put('users/{user}/ban', [UserController::class, 'ban'])->missing(fn() => ApiResponse::errorResponse(404, 'User not found'));
+        Route::put('users/{user}/unban', [UserController::class, 'unban'])->missing(fn() => ApiResponse::errorResponse(404, 'User not found'));
 
 //        album crud
         Route::post('albums', [AlbumController::class, 'store']);
-        Route::put('albums/{album}', [AlbumController::class, 'update']);
-        Route::delete('albums/{album}', [AlbumController::class, 'delete']);
-        Route::post('albums/{album}/songs', [AlbumController::class, 'storeSong']);
-        Route::put('albums/{album}/songs', [AlbumController::class, 'storeOrder']);
+        Route::put('albums/{album}', [AlbumController::class, 'update'])->missing(fn() => ApiResponse::errorResponse(404, 'Not found'));
+        Route::delete('albums/{album}', [AlbumController::class, 'delete'])->missing(fn() => ApiResponse::errorResponse(404, 'Not found'));
+        Route::post('albums/{album}/songs', [AlbumController::class, 'storeSong'])->missing(fn() => ApiResponse::errorResponse(404, 'Not found'));
+        Route::put('albums/{album}/songs/order', [AlbumController::class, 'storeOrder'])->missing(fn() => ApiResponse::errorResponse(404, 'Not found'));
 //        song crud
-        Route::post('albums/{album}/songs/{song}', [SongController::class, 'update']);
-        Route::delete('albums/{album}/songs/{song}', [SongController::class, 'delete']);
+        Route::post('albums/{album}/songs/{song}', [SongController::class, 'update'])->missing(fn() => ApiResponse::errorResponse(404, 'Not found'));
+        Route::delete('albums/{album}/songs/{song}', [SongController::class, 'delete'])->missing(fn() => ApiResponse::errorResponse(404, 'Not found'));
     });
 });

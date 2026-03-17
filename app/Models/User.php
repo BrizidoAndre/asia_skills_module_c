@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use App\cursorPage;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
+    use cursorPage;
     protected $primaryKey = 'user_id';
     protected $fillable = [
         'user_id',
